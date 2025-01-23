@@ -1,1 +1,3 @@
 .venv/
+src/settings.py
+src/__pycache__/
