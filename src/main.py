@@ -34,9 +34,16 @@ def add_url(message):
     args = command_parts[1].split(maxsplit=2)
     url = args[0]
     tags = args[1] if len(args) > 1 else None
-    depth = args[2] if len(args) > 2 else None
+    depth = int(args[2]) if len(args) > 2 else None
 
-    bot.send_message(message.chat.id, "Arching started...")
+    if tags == "depth=1":
+        depth = 1
+        tags = None
+    elif tags == "depth=0":
+        depth = 0
+        tags = None
+
+    bot.send_message(message.chat.id, "Archiving started...")
     if tags and depth:
         archivebox.add(url, tags, depth=depth)
     elif tags:
@@ -47,11 +54,7 @@ def add_url(message):
     latest = archivebox.get_latest()
     last = latest.get(0)
 
-    response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive size: {last['size']}"
-    if tags:
-        response += f"Archive tags: {tags}\n"
-    if depth:
-        response += f"Archive depth: {depth}\n"
+    response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}\nArchive depth: {depth}"
 
     bot.reply_to(message, response)
 
