@@ -20,6 +20,31 @@ def send_welcome(message):
         bot.reply_to(message, "You are not allowed to use this bot, all your commands will not execute.")
 
 
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    if not is_allowed(message.from_user.id):
+        bot.reply_to(message, "You are not allowed to use this bot.")
+        return
+    
+    tokens = message.text.split()
+
+    if len(tokens) > 2:
+        bot.reply_to(message, "to archive a url without commands you have to use this syntax: <url> [tags]")
+        return
+    
+    url = tokens[0]
+    tags = tokens[1] if len(tokens) == 2 else None
+    
+    bot.send_message(message.chat.id, "Archiving started...")
+    if not tags: archivebox.add(tokens[0])
+    else: archivebox.add(tokens[0], tokens[1])
+
+    last = archivebox.get_latest().get(0)
+
+    response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}"
+    bot.reply_to(message, response)
+
+
 @bot.message_handler(commands=["add"])
 def add_url(message):
     if not is_allowed(message.from_user.id):
