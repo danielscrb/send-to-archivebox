@@ -76,8 +76,7 @@ def add_url(message):
     else:
         archivebox.add(url)
 
-    latest = archivebox.get_latest()
-    last = latest.get(0)
+    last = archivebox.get_latest().get(0)
 
     response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}\nArchive depth: {depth}"
 
