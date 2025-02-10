@@ -1,6 +1,14 @@
 import telebot
 from pyarchivebox import PyArchiveBox
 import config
+import requests
+
+def website_is_available(url):
+    try:
+        response = requests.get(url, timeout=1)
+        return True
+    except requests.RequestException:
+        return False
 
 BOT_TOKEN = config.telegram_token
 bot = telebot.TeleBot(BOT_TOKEN)
