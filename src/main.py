@@ -28,7 +28,7 @@ def add_url(message):
     
     command_parts = message.text.split(maxsplit=1)
     if len(command_parts) < 2:
-        bot.reply_to(message, "Usage: /add <url> [tags] [depth].")
+        bot.reply_to(message, "Usage: /add <url> [tags] [depth]")
         return
     
     args = command_parts[1].split(maxsplit=2)
@@ -57,6 +57,31 @@ def add_url(message):
     response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}\nArchive depth: {depth}"
 
     bot.reply_to(message, response)
+
+
+@bot.message_handler(commands=["delete"])
+def delete_archive(message):
+    if not is_allowed(message.from_user.id):
+        bot.reply_to(message, "You are not allowed to use this bot.")
+        return
+    
+    command_parts = message.text.split(maxsplit=1)
+    if len(command_parts) < 2:
+        bot.reply_to(message, "Usage: /delete <archive title> <date added>")
+        return
+    tokens = command_parts[1].split()
+    if len(tokens) < 3:
+        bot.reply_to(message, "Usage: /delete <archive title> <date added>")
+        return
+
+    archive_date_added = " ".join(tokens[-2:])
+    archive_title = " ".join(tokens[:-2])
+
+    print(archive_title, archive_date_added)
+    
+    bot.send_message(message.chat.id, "Deletion started...")
+    archivebox.delete(archive_title, archive_date_added)
+    bot.reply_to(message, f"Archive \"{archive_title}\" {archive_date_added} deleted")
 
 
 bot.infinity_polling()
