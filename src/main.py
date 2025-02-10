@@ -20,31 +20,6 @@ def send_welcome(message):
         bot.reply_to(message, "You are not allowed to use this bot, all your commands will not execute.")
 
 
-@bot.message_handler(func=lambda message: True)
-def handle_message(message):
-    if not is_allowed(message.from_user.id):
-        bot.reply_to(message, "You are not allowed to use this bot.")
-        return
-    
-    tokens = message.text.split()
-
-    if len(tokens) > 2:
-        bot.reply_to(message, "to archive a url without commands you have to use this syntax: <url> [tags]")
-        return
-    
-    url = tokens[0]
-    tags = tokens[1] if len(tokens) == 2 else None
-    
-    bot.send_message(message.chat.id, "Archiving started...")
-    if not tags: archivebox.add(tokens[0])
-    else: archivebox.add(tokens[0], tokens[1])
-
-    last = archivebox.get_latest().get(0)
-
-    response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}"
-    bot.reply_to(message, response)
-
-
 @bot.message_handler(commands=["add"])
 def add_url(message):
     if not is_allowed(message.from_user.id):
@@ -106,6 +81,59 @@ def delete_archive(message):
     bot.send_message(message.chat.id, "Deletion started...")
     archivebox.delete(archive_title, archive_date_added)
     bot.reply_to(message, f"Archive \"{archive_title}\" {archive_date_added} deleted")
+
+
+@bot.message_handler(commands=["info", "help"])
+def info(message):
+    if not is_allowed(message.from_user.id):
+        bot.reply_to(message, "You are not allowed to use this bot.")
+        return
+
+    response = """
+        Here is some help with the bot commands and functionality:
+        you can archive a url without using any command, just send the bot the link and it will do it. 
+        This is the syntax of the normal message:
+        <url> [tags]
+        Remember that the tags must not have spaces and must be separated by commas, like this: tag1,tag2
+
+        /add:
+        the /add command allows you to archive a url.
+        This is it's syntax:
+        /add <url> [tags] [depth]
+        like before, the tags must not have any spaces between them.
+
+        /delete
+        the /delete command allows you to delete an archive
+        This is it's syntax:
+        /delete <archive title> <archive date>
+        the archive date must be exactly how you see it in archivebox: YYYY-MM-DD HH:mmPM/AM
+    """
+    bot.reply_to(message, response)
+
+
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    if not is_allowed(message.from_user.id):
+        bot.reply_to(message, "You are not allowed to use this bot.")
+        return
+    
+    tokens = message.text.split()
+
+    if len(tokens) > 2:
+        bot.reply_to(message, "to archive a url without commands you have to use this syntax: <url> [tags]")
+        return
+    
+    url = tokens[0]
+    tags = tokens[1] if len(tokens) == 2 else None
+    
+    bot.send_message(message.chat.id, "Archiving started...")
+    if not tags: archivebox.add(tokens[0])
+    else: archivebox.add(tokens[0], tokens[1])
+
+    last = archivebox.get_latest().get(0)
+
+    response = f"Archived url: {url}\nArchive title: {last['title']}\nArchive date added: {last['date_added']}\nArchive tags: {tags}"
+    bot.reply_to(message, response)
 
 
 bot.infinity_polling()
