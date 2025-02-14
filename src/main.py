@@ -43,6 +43,10 @@ def add_url(message):
     url = args[0]
     tags = args[1] if len(args) > 1 else None
     depth = int(args[2]) if len(args) > 2 else None
+    
+    if not website_is_available(url):
+        bot.reply_to(message, "The url you provided either isn't a url or isn't reachable at the moment")
+        return
 
     if tags == "depth=1":
         depth = 1
@@ -133,6 +137,10 @@ def handle_message(message):
     
     url = tokens[0]
     tags = tokens[1] if len(tokens) == 2 else None
+
+    if not website_is_available(url):
+        bot.reply_to(message, "The url you provided either isn't a url or isn't reachable at the moment")
+        return
     
     bot.send_message(message.chat.id, "Archiving started...")
     if not tags: archivebox.add(tokens[0])
